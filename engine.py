@@ -1,46 +1,48 @@
-# engine.py – Colorverse Evolution Engine
+# engine.py – Colorverse Evolution Engine (Optimized)
+# Fixed: Removed double updates, corrected initialization, single harmonie_feld update
 from config import *
-from Cluster import Cluster
-from Ring import Ring
-from Sphere import Sphere
-from MetaSphere import MetaSphere
-from UniverseNode import UniverseNode
+
 
 class Engine:
     def __init__(self):
+        """
+        Initialize the Colorverse engine with empty containers.
+        MetaSphere and UniverseNode are created in build_world() to avoid
+        circular references and empty list issues.
+        """
         self.zellen = []
         self.cluster = []
         self.ringe = []
         self.spheren = []
-
-        self.metasphere = MetaSphere(self.spheren)
-
+        self.metasphere = None  # Will be created in build_world
+        self.universe = None    # Will be created in build_world
+        
+        # Global harmony field - initialized with config defaults
         self.harmonie_feld = {
-            "global_harmonie": 0.87,
-            "global_drift": 0.4,
-            "stoerimpulse": 0.515,
+            "global_harmonie": GLOBAL_HARMONIE_START,
+            "global_drift": GLOBAL_DRIFT_START,
+            "stoerimpulse": GLOBAL_STOER_START,
         }
-
-        self.universe = UniverseNode(self, self.metasphere)
         self.step_count = 0
 
-
     def hexagon_fluidity(self):
+        """
+        Dynamic neighbor assignment based on drift and harmony.
+        Cells in clusters are skipped as they have fixed neighbors.
+        """
         n = len(self.zellen)
-
         for idx, z in enumerate(self.zellen):
-
-            # Cluster-Zellen bleiben stabil
+            # Cluster cells have fixed neighbors
             if z.in_cluster:
                 continue
 
-            # Fluidität abhängig von Drift + Harmonie + Energie
+            # Only apply fluidity if cell has sufficient drift and energy
             if z.drift > 0.2 and z.energy > 0.3:
-
-                # Fluiditätsfaktor: Drift + Disharmonie
+                # Calculate shift based on drift and disharmony
                 shift = int((z.drift + (1 - z.harmonie)) * 6)
                 shift = (shift + idx) % n
 
+                # Assign 6 hexagonal neighbors
                 z.nachbarn = [
                     self.zellen[(idx - 1 + shift) % n],
                     self.zellen[(idx + 1 + shift) % n],
@@ -50,48 +52,65 @@ class Engine:
                     self.zellen[(idx + 3 + shift) % n],
                 ]
 
-    # =====================================================================
-    #  HAUPT-SCHRITT DER EVOLUTION
-    # =====================================================================
     def step(self):
-    
+        """
+        Main evolution step. Updates all layers in hierarchy:
+        1. Cells (atomic units)
+        2. Clusters (aggregation only, no cell updates)
+        3. Rings
+        4. Spheres
+        5. MetaSphere
+        6. UniverseNode
+        7. Dynamic neighbors
+        8. Global harmony field (single update)
+        9. Evolution system (seeds, disturbances)
+        """
         self.step_count += 1
-        # 1. Zellen updaten
+
+        # =====================================================
+        # 1. Update all cells (ONLY HERE - no duplicates!)
+        # =====================================================
         for z in self.zellen:
             z.update()
 
-        # 2. Cluster updaten
+        # =====================================================
+        # 2. Update clusters (aggregation only)
+        # =====================================================
         for c in self.cluster:
             c.update()
-    
-        # 3. Ringe updaten
+
+        # =====================================================
+        # 3. Update rings
+        # =====================================================
         for r in self.ringe:
             r.update()
 
-        # 4. Sphären updaten
+        # =====================================================
+        # 4. Update spheres
+        # =====================================================
         for s in self.spheren:
             s.update()
 
-        # 5. MetaSphere updaten
+        # =====================================================
+        # 5. Update MetaSphere
+        # =====================================================
         if self.metasphere:
             self.metasphere.update()
 
-        # 6. UniverseNode updaten
+        # =====================================================
+        # 6. Update UniverseNode
+        # =====================================================
         if ENABLE_UNIVERSE and self.universe:
             self.universe.update_universe()
 
-        # 7. Hexagon-Fluidity (Dynamische Nachbarschaften)
+        # =====================================================
+        # 7. Dynamic neighbor assignment
+        # =====================================================
         self.hexagon_fluidity()
 
-        # 8. Optional: Wander-System
-        # self.hexagon_wander()
-
-        # ===================== EVOLUTIONSSYSTEM ==============
         # =====================================================
-
-        #------------------------------------------------------
-        # Harmonie-Feld aktualisieren
-        #------------------------------------------------------
+        # 8. Update global harmony field (SINGLE UPDATE!)
+        # =====================================================
         if self.zellen:
             self.harmonie_feld["global_harmonie"] = (
                 sum(z.harmonie for z in self.zellen) / len(self.zellen)
@@ -100,24 +119,20 @@ class Engine:
                 sum(z.drift for z in self.zellen) / len(self.zellen)
             )
 
-        # ---------------------------------------------------------
-        # freie Zellen sammeln
-        # ---------------------------------------------------------
+        # =====================================================
+        # 9. Evolution System
+        # =====================================================
+        
+        # --- 9.1: Mark evolution seeds (free cells only) ---
         freie = [z for z in self.zellen if not z.in_cluster]
-
-        # ---------------------------------------------------------
-        # freie Zellen → Evolutionskeime markieren
-        # ---------------------------------------------------------
         for z in freie:
             z.evolutionskeim = (
-                z.drift > 0.4 and
-                z.energy > 0.6 and
-                z.harmonie < 0.5
+                z.drift > DRIFT_THRESHOLD and
+                z.energy > ENERGY_THRESHOLD and
+                z.harmonie < HARMONIE_THRESHOLD
             )
 
-        # ---------------------------------------------------------
-        # 3er-Störimpulse erzeugen
-        # ---------------------------------------------------------
+        # --- 9.2: Create triple disturbances ---
         keime = [z for z in freie if z.evolutionskeim]
         dreier = [
             keime[i:i+3]
@@ -131,16 +146,12 @@ class Engine:
                 z.drift += 0.05
             self.harmonie_feld["stoerimpulse"] += 0.2
 
-        # ---------------------------------------------------------
-        # Harmonie-Feld-Resonanz auf alle Zellen anwenden
-        # ---------------------------------------------------------
+        # --- 9.3: Apply harmony field resonance to all cells ---
         for z in self.zellen:
             z.drift += self.harmonie_feld["stoerimpulse"] * 0.01
             z.energy += (1 - self.harmonie_feld["global_harmonie"]) * 0.005
 
-        # ---------------------------------------------------------
-        # automatische Clusterbildung aus Evolutionskeimen
-        # ---------------------------------------------------------
+        # --- 9.4: Automatic cluster formation from evolution seeds ---
         neue_cluster = []
         keime = [z for z in self.zellen if z.evolutionskeim and not z.in_cluster]
 
@@ -160,5 +171,10 @@ class Engine:
                 self.harmonie_feld["stoerimpulse"] *= 0.5
 
         self.cluster.extend(neue_cluster)
-        print(f"[ENGINE] step={self.step_count} harm={self.harmonie_feld['global_harmonie']:.2f} drift={self.harmonie_feld['global_drift']:.2f} stoer={self.harmonie_feld['stoerimpulse']:.2f}")
 
+        # =====================================================
+        # 10. Debug output (controlled by config)
+        # =====================================================
+        if ENABLE_LOGGING and self.step_count % DEBUG_INTERVAL == 0:
+            print(f"[ENGINE] step={self.step_count} harm={self.harmonie_feld['global_harmonie']:.2f} "
+                  f"drift={self.harmonie_feld['global_drift']:.2f} stoer={self.harmonie_feld['stoerimpulse']:.2f}")
