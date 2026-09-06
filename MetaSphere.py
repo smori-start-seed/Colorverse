@@ -1,12 +1,31 @@
-# MetaSphere.py – Harmonische Aggregation der Sphere-Ebene
+# MetaSphere.py – Colorverse MetaSphere Unit (Optimized)
+# Fixed: Removed debug prints
 from config import *
 
+
 class MetaSphere:
+    """
+    MetaSphere of Spheres.
+    
+    Top-level aggregation unit that collects and averages values from all Spheres.
+    Provides the final color and metric values for the UniverseNode.
+    
+    Attributes:
+        spheren: List of Sphere objects
+        hue_avg, sat_avg, bri_avg: Average color values
+        energy_avg, harmonie_avg, drift_avg: Average meta values
+    """
+    
     def __init__(self, spheren_liste):
-        # Liste von Spheres (meist 1)
+        """
+        Initialize a MetaSphere with a list of Spheres.
+        
+        Args:
+            spheren_liste: List of Sphere objects
+        """
         self.spheren = spheren_liste
 
-        # Aggregierte Meta-Werte
+        # Aggregated values
         self.hue_avg = 0.3
         self.sat_avg = 0.2
         self.bri_avg = 0.4
@@ -15,28 +34,28 @@ class MetaSphere:
         self.harmonie_avg = 0.4
         self.drift_avg = 0.3
 
-    # ---------------------------------------------------------
-    # 1. Öffentliche Update-Methode
-    # ---------------------------------------------------------
     def update(self):
+        """Update the MetaSphere by updating all spheres and aggregating values."""
         self.update_metasphere()
 
-    # ---------------------------------------------------------
-    # 2. MetaSphere-Update: Spheres updaten + Aggregation
-    # ---------------------------------------------------------
     def update_metasphere(self):
-
-        # 2.1 Alle Spheres updaten
+        """
+        Core MetaSphere update:
+        1. Update all spheres
+        2. Aggregate all values
+        """
+        # Update all spheres
         for s in self.spheren:
             s.update()
 
-        # 2.2 Meta-Werte aggregieren
+        # Aggregate all values
         self.berechne_metasphere()
 
-    # ---------------------------------------------------------
-    # 3. Aggregation der Sphere-Werte
-    # ---------------------------------------------------------
     def berechne_metasphere(self):
+        """
+        Aggregate all values from all spheres.
+        If no spheres, values remain at their initial defaults.
+        """
         if not self.spheren:
             return
 
@@ -56,7 +75,7 @@ class MetaSphere:
             harmonies.append(s.harmonie_avg)
             drifts.append(s.drift_avg)
 
-        # Durchschnittswerte
+        # Calculate averages
         self.hue_avg = sum(hues) / len(hues)
         self.sat_avg = sum(sats) / len(sats)
         self.bri_avg = sum(bris) / len(bris)
@@ -65,10 +84,11 @@ class MetaSphere:
         self.harmonie_avg = sum(harmonies) / len(harmonies)
         self.drift_avg = sum(drifts) / len(drifts)
 
-    # ---------------------------------------------------------
-    # 4. Ausgabe für UniverseNode
-    # ---------------------------------------------------------
     def get_meta(self):
+        """
+        Return all meta values as a dictionary.
+        Used by UniverseNode for global state assessment.
+        """
         return {
             "hue": self.hue_avg,
             "sat": self.sat_avg,
@@ -77,6 +97,7 @@ class MetaSphere:
             "harmonie": self.harmonie_avg,
             "drift": self.drift_avg
         }
-    def get_farbsatz(self):
-        return (self.hue_avg, self.sat_avg, self.bri_avg)
 
+    def get_farbsatz(self):
+        """Return the aggregated color set for UniverseNode."""
+        return (self.hue_avg, self.sat_avg, self.bri_avg)

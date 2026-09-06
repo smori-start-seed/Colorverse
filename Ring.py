@@ -1,38 +1,55 @@
-# Ring.py – Colorverse Evolution
+# Ring.py – Colorverse Ring Unit (Optimized)
+# Fixed: Removed debug prints
 from config import *
+
+
 class Ring:
+    """
+    Ring of Clusters.
+    
+    Aggregates color and metric values from all clusters in the ring.
+    
+    Attributes:
+        cluster: List of Cluster objects
+        hue_avg, sat_avg, bri_avg: Average color values
+    """
+    
     def __init__(self, cluster_liste):
-        # Liste von Clustern (11 Zellen pro Cluster)
+        """
+        Initialize a Ring with a list of Clusters.
+        
+        Args:
+            cluster_liste: List of Cluster objects
+        """
         self.cluster = cluster_liste
 
-        # Aggregierte Farbsätze
+        # Aggregated color values
         self.hue_avg = 0.0
         self.sat_avg = 0.0
         self.bri_avg = 0.0
 
-    # ---------------------------------------------------------
-    # 1. Öffentliche Update-Methode
-    # ---------------------------------------------------------
     def update(self):
+        """Update the Ring by updating all clusters and aggregating values."""
         self.update_ring()
 
-    # ---------------------------------------------------------
-    # 2. Ring-Update: Cluster updaten + Farbsatz aggregieren
-    # ---------------------------------------------------------
     def update_ring(self):
-
-        # 2.1 Alle Cluster updaten
+        """
+        Core Ring update:
+        1. Update all clusters
+        2. Aggregate color values
+        """
+        # Update all clusters
         for c in self.cluster:
             c.update()
 
-        # 2.2 Farbsatz aggregieren
+        # Aggregate color values
         self.berechne_ring_farbsatz()
-        print(f"[RING] hue={self.hue_avg:.2f} sat={self.sat_avg:.2f} bri={self.bri_avg:.2f}")
 
-    # ---------------------------------------------------------
-    # 3. Aggregierten Farbsatz berechnen
-    # ---------------------------------------------------------
     def berechne_ring_farbsatz(self):
+        """
+        Calculate average color values from all clusters.
+        If no clusters, all values are set to 0.
+        """
         if not self.cluster:
             self.hue_avg = 0.0
             self.sat_avg = 0.0
@@ -53,9 +70,6 @@ class Ring:
         self.sat_avg = sum(sats) / len(sats)
         self.bri_avg = sum(bris) / len(bris)
 
-    # ---------------------------------------------------------
-    # 4. Ausgabe für Sphere / MetaSphere
-    # ---------------------------------------------------------
     def get_farbsatz(self):
+        """Return the aggregated color set for Sphere."""
         return (self.hue_avg, self.sat_avg, self.bri_avg)
-
