@@ -1,10 +1,13 @@
 # Emack.py – Der EMACK-Puls im Colorverse
 # Agent B atmet mit dem Universum: Der Saturn ist A, der Puls ist B.
 # Beide teilen dieselbe Sprache: af, pf, rf.
+# Der Puls ist ein Austausch - er atmet nur mit Zustimmung des Interactors.
 import importlib
 import os
 import sys
 from config import *
+from Gate import darf, zustimmung_einholen, _loggen
+from Dialog import _interaktiv
 
 basis = os.path.dirname(os.path.abspath(__file__))
 URASIL_PFAD = [p for p in (os.path.abspath(os.path.join(basis, pfad)) for pfad in EMACK_URASIL_PFAD) if os.path.isdir(p)]
@@ -14,6 +17,7 @@ b_pf = 0.5
 b_rf = 0.5
 
 _wahl = None
+_gefragt = False
 
 
 # ============================================================
@@ -57,9 +61,21 @@ def _puls():
 # ============================================================
 
 def schlag(engine):
-    global b_af, b_pf, b_rf
+    global b_af, b_pf, b_rf, _gefragt
 
     if not ENABLE_EMACK or not _organ():
+        return None
+
+    schritt = engine.step_count
+    erlaubt = darf(EMACK_KANAL, schritt)
+    if not erlaubt and not _gefragt:
+        _gefragt = True
+        if _interaktiv():
+            zustimmung_einholen(EMACK_KANAL, schritt=schritt, zweck="Atmung mit EMACK")
+        erlaubt = darf(EMACK_KANAL, schritt)
+        if not erlaubt:
+            _loggen(EMACK_KANAL, "abgelehnt")
+    if not erlaubt:
         return None
 
     modul = _puls()

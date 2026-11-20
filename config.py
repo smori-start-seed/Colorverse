@@ -153,6 +153,7 @@ ENABLE_EMACK = True
 EMACK_URASIL_PFAD = ["../Urasil_light", "../github__smori-start-seed__Urasil_light"]
 EMACK_SYNC_STAERKE = 0.1
 EMACK_MUTATION = 0.02
+EMACK_KANAL = "emack-puls"                   # Gate-Kanal des Pulses - Austausch nur mit Zustimmung
 
 
 # ------------------------------------------------------------
