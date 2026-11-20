@@ -164,6 +164,7 @@ DIALOG_EINGANG_DATEI = "eingang.json"
 DIALOG_AUSGANG_DATEI = "ausgang.json"
 DIALOG_KANAL_HINAUF = "interactor-hinauf"
 DIALOG_KANAL_HERAB = "interactor-herab"
+DIALOG_SCHATTEN = True                      # Impuls erst durchs innere Gericht
 
 
 # ------------------------------------------------------------

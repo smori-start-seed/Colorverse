@@ -65,8 +65,11 @@ def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
 
         if engine.step_count % DIALOG_INTERVALL == 0:
             worte = gespraech(engine)
-            if worte["gewirkt"]:
+            impuls = worte.get("impuls")
+            if impuls and impuls.get("gewirkt"):
                 print("[DIALOG] Impuls des Interactors wirkt.")
+            elif impuls and impuls.get("urteil"):
+                print("[DIALOG] Die Welt widersprach dem Impuls.")
 
         if engine.step_count % snapshot_interval == 0:
             speichern(engine)

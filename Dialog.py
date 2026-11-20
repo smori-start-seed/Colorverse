@@ -1,13 +1,19 @@
 # Dialog.py – Das Gespraech mit dem Interactor
 # Hinauf: Der Zustand des Colorverse - nur mit Zustimmung.
 # Herab: Was der Interactor sagt - nur mit Zustimmung,
-#        und es wirkt wie ein Impuls in das Evolutionsfeld.
+#        und erst durch das innere Gericht (Schattenlauf),
+#        bevor es in die Welt wirkt. Widerspricht die Welt,
+#        fragt die Wache - ausser im Skriptbetrieb, da gilt ihr Nein.
 import json
 import os
 import sys
 from config import *
-from Gate import darf, senden, empfangen, zustimmung_einholen, _loggen
+from Gate import darf, senden, empfangen, zustimmung_einholen, _loggen, alarmfrage
 
+
+# ============================================================
+#  KLEINE WOERTER
+# ============================================================
 
 def _interaktiv():
     try:
@@ -51,7 +57,7 @@ def hinauf(engine):
 
 
 # ============================================================
-#  HERAB - Impuls des Interactors
+#  IMPULS & SCHATTEN (das innere Gericht)
 # ============================================================
 
 def _impuls_anwenden(engine, impuls):
@@ -68,6 +74,22 @@ def _impuls_anwenden(engine, impuls):
 
     return bool(versatz)
 
+
+def _einmal_patch(impuls):
+    # Ein Impuls ist eine Beruehrung, kein Dauerzustand:
+    # im Schattenlauf wirkt er genau einmal, dann lebt die Welt weiter.
+    erste = [True]
+
+    def patch(welt):
+        if erste[0]:
+            erste[0] = False
+            _impuls_anwenden(welt, impuls)
+    return patch
+
+
+# ============================================================
+#  HERAB - Impuls des Interactors
+# ============================================================
 
 def herab(engine):
     if not os.path.exists(DIALOG_EINGANG_DATEI):
@@ -92,9 +114,33 @@ def herab(engine):
     if paket is None:
         return None
 
+    ergebnis = None
+    ueberschrieben = False
+
+    if DIALOG_SCHATTEN:
+        from Schatten import simuliere
+        ergebnis = simuliere(engine, patch=_einmal_patch(paket))
+
+        if not ergebnis["annahme"]:
+            ueber = False
+            if _interaktiv():
+                frage = (f"[WACHE] Der Impuls widerspricht dem Sinn "
+                         f"(Harmonie {ergebnis['harmonie_delta']:+.3f}, "
+                         f"Drift {ergebnis['drift_delta']:+.3f}). "
+                         "Trotzdem wirken? (j/n): ")
+                ueber = alarmfrage(frage)
+
+            if not ueber:
+                _loggen(DIALOG_KANAL_HERAB, "abgelehnt", erlaubt=False)
+                os.remove(DIALOG_EINGANG_DATEI)
+                return {"gewirkt": False, "urteil": ergebnis, "ueberschrieben": False}
+
+            ueberschrieben = True
+            _loggen(DIALOG_KANAL_HERAB, "ueberschreibung", erlaubt=True)
+
     gewirkt = _impuls_anwenden(engine, paket)
     os.remove(DIALOG_EINGANG_DATEI)
-    return gewirkt
+    return {"gewirkt": gewirkt, "urteil": ergebnis, "ueberschrieben": ueberschrieben}
 
 
 # ============================================================
@@ -102,6 +148,7 @@ def herab(engine):
 # ============================================================
 
 def gespraech(engine):
-    gewirkt = herab(engine)
-    auskunft = hinauf(engine)
-    return {"gewirkt": gewirkt, "auskunft": auskunft}
+    return {
+        "impuls": herab(engine),
+        "auskunft": hinauf(engine),
+    }
