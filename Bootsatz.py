@@ -89,6 +89,9 @@ menuentry "FARB-OS" {{
 def _kram_kopieren(wurzel, programm):
     bericht = _lauf(["ldd", programm])
     zu_kopieren = []
+    for loader in ("/lib64/ld-linux-x86-64.so.2", "/lib/ld-linux-x86-64.so.2"):
+        if os.path.exists(loader):
+            zu_kopieren.append(loader)
     for zeile in bericht.splitlines():
         teile = zeile.strip().split()
         if "=>" in teile and os.path.exists(teile[2]):
@@ -98,8 +101,8 @@ def _kram_kopieren(wurzel, programm):
     for quelle in set(zu_kopieren):
         ziel = os.path.join(wurzel, quelle.lstrip("/"))
         os.makedirs(os.path.dirname(ziel), exist_ok=True)
-        if not os.path.exists(ziel):
-            shutil.copy2(quelle, ziel)
+        shutil.copy2(quelle, ziel)
+        os.chmod(ziel, 0o755)
     return len(set(zu_kopieren))
 
 
@@ -154,6 +157,11 @@ def baue_initramfs(ordner=BOOT_ORDNER):
         if hinaus.returncode != 0:
             raise RuntimeError("cpio fiel aus")
     _lauf(["gzip", "-f", cpio_pfad])
+
+    inhalt = _lauf(["sh", "-c", f"zcat {cpio_pfad}.gz | cpio -it"])
+    for pfad in ("./farb-os/python/bin/python3", "./lib64/ld-linux-x86-64.so.2", "./init"):
+        if pfad not in inhalt:
+            raise RuntimeError(f"{pfad} fehlt im initramfs")
 
     return kernel, cpio_pfad + ".gz"
 
