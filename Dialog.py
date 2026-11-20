@@ -26,14 +26,15 @@ def _zustand(engine):
 
 
 def hinauf(engine):
-    if not darf(DIALOG_KANAL_HINAUF):
+    schritt = engine.step_count
+    if not darf(DIALOG_KANAL_HINAUF, schritt):
         if sys.stdin.isatty() if hasattr(sys.stdin, "isatty") else False:
-            zustimmung_einholen(DIALOG_KANAL_HINAUF)
-        if not darf(DIALOG_KANAL_HINAUF):
+            zustimmung_einholen(DIALOG_KANAL_HINAUF, schritt=schritt, zweck="Lesen des Zustands")
+        if not darf(DIALOG_KANAL_HINAUF, schritt):
             return None
 
     zustand = _zustand(engine)
-    paket = senden(DIALOG_KANAL_HINAUF, zustand)
+    paket = senden(DIALOG_KANAL_HINAUF, zustand, schritt=schritt)
     if paket is None:
         return None
 
@@ -68,10 +69,10 @@ def herab(engine):
     with open(DIALOG_EINGANG_DATEI, "r", encoding="utf-8") as f:
         roh = f.read()
 
-    if not darf(DIALOG_KANAL_HERAB):
+    if not darf(DIALOG_KANAL_HERAB, engine.step_count):
         if sys.stdin.isatty() if hasattr(sys.stdin, "isatty") else False:
-            zustimmung_einholen(DIALOG_KANAL_HERAB)
-        if not darf(DIALOG_KANAL_HERAB):
+            zustimmung_einholen(DIALOG_KANAL_HERAB, schritt=engine.step_count, zweck="Impulse in das Evolutionsfeld")
+        if not darf(DIALOG_KANAL_HERAB, engine.step_count):
             return None
 
     try:
@@ -80,7 +81,7 @@ def herab(engine):
         os.remove(DIALOG_EINGANG_DATEI)
         return None
 
-    paket = empfangen(DIALOG_KANAL_HERAB, impuls)
+    paket = empfangen(DIALOG_KANAL_HERAB, impuls, schritt=engine.step_count)
     if paket is None:
         return None
 

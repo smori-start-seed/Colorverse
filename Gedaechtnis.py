@@ -5,15 +5,15 @@ import hashlib
 import json
 import os
 from config import *
-from HwScan import signatur as _hw_signatur, scan as _hw_scan
+from HwScan import scan as _hw_scan, stabile_signatur as _hw_stabil
 
 
 # ============================================================
-#  HARDWARE-SIGNATUR (voller HW-Scan)
+#  HARDWARE-SIGNATUR (ruhiger Kern - siehe installation.py)
 # ============================================================
 
 def hardware_signatur():
-    return _hw_signatur(_hw_scan())
+    return _hw_stabil(_hw_scan())
 
 
 def _schluessel():

@@ -10,6 +10,7 @@ from Emack import schlag
 from Terminal import zeige
 from Klang import erzeuge as klang_erzeugen
 from Dialog import gespraech
+from installation import wache
 
 
 # ============================================================
@@ -17,13 +18,23 @@ from Dialog import gespraech
 # ============================================================
 
 def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
+    geburt = wache()
+    if geburt.get("fremd"):
+        print("[FARB-OS]  Der Geburtsakt widerspricht dieser Maschine.")
+        print("           Dieses Unikat wohnt nicht hier. Keine Erinnerung, keine Geburt.")
+        return
+
     engine = Engine()
     build_world(engine)
 
-    if samen_und_laden(engine):
+    if laden(engine):
         print(f"[FARB-OS] Erinnerung geladen – Schritt {engine.step_count}")
     else:
-        print(f"[FARB-OS] Neugeboren – dieses Colorverse beginnt bei null.")
+        samen(engine)
+        if "geburtsakt" in geburt:
+            print(f"[FARB-OS]  Erinnerung unbekannt – die Welt sät neu, Individualität {geburt['individualitaet']:.3f}.")
+        else:
+            print(f"[FARB-OS] Neugeboren – Individualität {geburt['individualitaet']:.3f}.")
 
     for _ in range(steps):
         engine.step()
@@ -50,13 +61,6 @@ def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
 
     speichern(engine)
     print(f"[FARB-OS]  Colorverse verwahrt: {GEDAECHTNIS_DATEI}")
-
-
-def samen_und_laden(engine):
-    if laden(engine):
-        return True
-    samen(engine)
-    return False
 
 
 if __name__ == "__main__":

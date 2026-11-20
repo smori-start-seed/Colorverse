@@ -95,6 +95,14 @@ def signatur(daten=None):
     return hashlib.sha256(daten).hexdigest()
 
 
+def stabile_signatur(daten=None):
+    # Nur der ruhige Kern: Plattform und Architektur aendern sich
+    # nicht mit Kernel-Updates oder MAC-Zufall.
+    daten = daten or scan()
+    kern = {k: daten[k] for k in ("plattform", "architektur")}
+    return hashlib.sha256(json.dumps(kern, sort_keys=True).encode()).hexdigest()
+
+
 def _kern(daten):
     return {k: daten[k] for k in ("plattform", "kernel", "architektur", "prozessoren", "speicher", "platte", "mac")}
 

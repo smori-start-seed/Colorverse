@@ -165,3 +165,17 @@ DIALOG_AUSGANG_DATEI = "ausgang.json"
 DIALOG_KANAL_HINAUF = "interactor-hinauf"
 DIALOG_KANAL_HERAB = "interactor-herab"
 
+
+# ------------------------------------------------------------
+# 15) GEBURT - Attestierung der Identitaet
+# ------------------------------------------------------------
+
+GEBURTSAKT_DATEI = "geburtsakt.bin"
+
+
+# ------------------------------------------------------------
+# 16) ZUSTIMMUNG - Ablauf in Schritten des Colorverse
+# ------------------------------------------------------------
+
+ZUSTIMMUNG_DAUER = 500   # Schritte, danach fragt das Gate erneut
+

@@ -1,5 +1,7 @@
 # Gate.py – Datenaustausch nur mit Zustimmung des Interactors
 # Ohne Eintrag im Ledger fuehrt kein Weg nach draussen und kein Weg hierher.
+# Eine Zustimmung lebt in Schritten des Colorverse - und verblasst damit
+# in der eigenen Zeit des Systems, nicht in einer Wanduhr.
 import json
 import os
 import time
@@ -36,15 +38,20 @@ def _loggen(kanal, ereignis, erlaubt=False):
 
 
 # ============================================================
-#  ZUSTIMMUNG
+#  ZUSTIMMUNG (zweck-gebunden, mit Ablauf in Schritten)
 # ============================================================
 
-def zustimmen(kanal):
+def zustimmen(kanal, zweck=None, schritt=None, dauer=ZUSTIMMUNG_DAUER):
     ledger = _ledger_lesen()
-    ledger[kanal] = {
+    eintrag = {
         "erlaubt": True,
         "seit": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
+    if zweck:
+        eintrag["zweck"] = zweck
+    if schritt is not None and dauer is not None:
+        eintrag["ablauf"] = schritt + dauer
+    ledger[kanal] = eintrag
     _ledger_schreiben(ledger)
     _loggen(kanal, "zustimmung", erlaubt=True)
 
@@ -56,17 +63,35 @@ def widerrufen(kanal):
     _loggen(kanal, "widerruf", erlaubt=False)
 
 
-def darf(kanal):
-    return bool(_ledger_lesen().get(kanal, {}).get("erlaubt", False))
+def darf(kanal, schritt=None):
+    eintrag = _ledger_lesen().get(kanal)
+    if not eintrag or not eintrag.get("erlaubt", False):
+        return False
+
+    ablauf = eintrag.get("ablauf")
+    if ablauf is not None and schritt is not None and schritt > ablauf:
+        widerrufen(kanal)
+        return False
+
+    return True
 
 
-def zustimmung_einholen(kanal):
+def zustimmung_einholen(kanal, schritt=None, zweck=None):
+    frage = f"[GATE] Austausch ueber '{kanal}'"
+    if zweck:
+        frage += f" (Zweck: {zweck})"
+    frage += " erlauben? (j/n/i): "
+
     try:
-        antwort = input(f"[GATE] Austausch ueber '{kanal}' erlauben? (j/n): ").strip().lower()
+        antwort = input(frage).strip().lower()
     except EOFError:
         antwort = "n"
+
     if antwort == "j":
-        zustimmen(kanal)
+        zustimmen(kanal, zweck=zweck, schritt=schritt)
+        return True
+    if antwort == "i":
+        zustimmen(kanal, zweck=zweck, schritt=None, dauer=None)
         return True
     widerrufen(kanal)
     return False
@@ -76,16 +101,16 @@ def zustimmung_einholen(kanal):
 #  AUSTAUSCH (der einzige Weg rein und raus)
 # ============================================================
 
-def senden(kanal, daten):
-    erlaubt = darf(kanal)
+def senden(kanal, daten, schritt=None):
+    erlaubt = darf(kanal, schritt)
     _loggen(kanal, "senden", erlaubt=erlaubt)
     if not erlaubt:
         return None
     return daten
 
 
-def empfangen(kanal, daten):
-    erlaubt = darf(kanal)
+def empfangen(kanal, daten, schritt=None):
+    erlaubt = darf(kanal, schritt)
     _loggen(kanal, "empfangen", erlaubt=erlaubt)
     if not erlaubt:
         return None
