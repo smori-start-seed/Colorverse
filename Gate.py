@@ -61,7 +61,10 @@ def darf(kanal):
 
 
 def zustimmung_einholen(kanal):
-    antwort = input(f"[GATE] Austausch ueber '{kanal}' erlauben? (j/n): ").strip().lower()
+    try:
+        antwort = input(f"[GATE] Austausch ueber '{kanal}' erlauben? (j/n): ").strip().lower()
+    except EOFError:
+        antwort = "n"
     if antwort == "j":
         zustimmen(kanal)
         return True

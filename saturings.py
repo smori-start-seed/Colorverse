@@ -90,6 +90,15 @@ def build_world(engine: Engine):
     if ENABLE_SPHERE:
         engine.spheren = [Sphere(engine.ringe)]
 
+    # Erster Aufstieg: von unten nach oben aktualisieren
+    # (jede Ebene genau einmal - die Zellen sind frisch)
+    for c in engine.cluster:
+        c.update()
+    for r in engine.ringe:
+        r.update()
+    for s in engine.spheren:
+        s.update()
+
     # Ebene 5: MetaSphere
     # NICHT neu erzeugen – Engine hat sie bereits!
     if ENABLE_METASPHERE:

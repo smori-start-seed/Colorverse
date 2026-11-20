@@ -154,3 +154,14 @@ EMACK_URASIL_PFAD = ["../Urasil_light", "../github__smori-start-seed__Urasil_lig
 EMACK_SYNC_STAERKE = 0.1
 EMACK_MUTATION = 0.02
 
+
+# ------------------------------------------------------------
+# 14a) DIALOG - das Gespraech mit dem Interactor
+# ------------------------------------------------------------
+
+DIALOG_INTERVALL = 25
+DIALOG_EINGANG_DATEI = "eingang.json"
+DIALOG_AUSGANG_DATEI = "ausgang.json"
+DIALOG_KANAL_HINAUF = "interactor-hinauf"
+DIALOG_KANAL_HERAB = "interactor-herab"
+

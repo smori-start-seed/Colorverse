@@ -9,6 +9,7 @@ from HwScan import samen
 from Emack import schlag
 from Terminal import zeige
 from Klang import erzeuge as klang_erzeugen
+from Dialog import gespraech
 
 
 # ============================================================
@@ -35,6 +36,11 @@ def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
             datei = klang_erzeugen(engine)
             if datei:
                 print(f"[KLANG]  {datei}")
+
+        if engine.step_count % DIALOG_INTERVALL == 0:
+            worte = gespraech(engine)
+            if worte["gewirkt"]:
+                print("[DIALOG] Impuls des Interactors wirkt.")
 
         if engine.step_count % snapshot_interval == 0:
             speichern(engine)

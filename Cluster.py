@@ -39,19 +39,16 @@ class Cluster:
             z.nachbarn = [left, right]
 
     # ---------------------------------------------------------
-    # 1. Update aller Zellen + Mutation
+    # 1. Clusterwerte aktualisieren
+    #    (Zellen wurden bereits von der Engine aktualisiert)
     # ---------------------------------------------------------
     def update_cluster(self):
 
-        # 1.1 Zellen updaten
-        for z in self.zellen:
-            z.update()
-
-        # 1.2 Clusterwerte berechnen
+        # 1.1 Clusterwerte berechnen
         self.berechne_clusterwerte()
         self.berechne_farbsatz()
 
-        # 1.3 Mutation anwenden
+        # 1.2 Mutation anwenden
         self.mutation()
 
     # ---------------------------------------------------------
