@@ -61,9 +61,11 @@ mount -t sysfs none /sys 2>/dev/null
 mount -t devtmpfs none /dev 2>/dev/null
 mkdir -p /run /farb-os/home
 mount -t tmpfs none /run 2>/dev/null
-BODEN=$(cat /proc/cmdline | tr ' ' '\n' | grep '^boden=PARTUUID=' | cut -d= -f3)
+BODEN=$(cat /proc/cmdline | tr ' ' '\\n' | grep '^boden=PARTUUID=' | cut -d= -f3)
 [ -n "$BODEN" ] && mount -t auto /dev/disk/by-partuuid/$BODEN /farb-os/home 2>/dev/null
 grep -q ' /farb-os/home ' /proc/mounts || mount -t tmpfs none /farb-os/home 2>/dev/null
+[ -e /farb-os/python/bin/python3 ] && echo [INIT] BIN_OK || echo [INIT] BIN_FEHLT
+[ -e /lib64/ld-linux-x86-64.so.2 ] && echo [INIT] LDR_OK || echo [INIT] LDR_FEHLT
 cd /farb-os/home
 exec /farb-os/python/bin/python3 -u /farb-os/os/farb_os.py
 """
@@ -126,8 +128,14 @@ def baue_initramfs(ordner=BOOT_ORDNER):
     for werkzeug in ("sh", "mount", "mkdir", "cat", "sleep", "sync", "tr", "grep", "cut"):
         os.symlink("busybox", os.path.join(wurzel, "bin", werkzeug))
 
-    _python_saehen(wurzel)
-    _kram_kopieren(wurzel, os.path.join(wurzel, "farb-os", "python", "bin", "python3"))
+    python_bin = _python_saehen(wurzel)
+    kram = _kram_kopieren(wurzel, python_bin + "/bin/python3")
+    print(f"[BOOTSATZ] Python gesaet: {python_bin} | Bibliotheken: {kram}")
+
+    probe = subprocess.run([python_bin + "/bin/python3", "--version"], capture_output=True, text=True)
+    if probe.returncode != 0:
+        raise RuntimeError(f"das gesaete Python spricht nicht: {probe.stderr.strip()[:200]}")
+    print("[BOOTSATZ] Probe:", probe.stdout.strip() or probe.stderr.strip())
 
     os_dir = os.path.dirname(os.path.abspath(__file__))
     for datei in os.listdir(os_dir):
