@@ -17,7 +17,7 @@ jobs:
       - name: Der Keim atmet in QEMU
         run: |
           for i in $(seq 1 60); do
-            (timeout 360 qemu-system-x86_64 -m 1024 -cdrom bootsatz/bootsatz.iso -nographic -no-reboot </dev/null > boot.log 2>&1; touch boot.fertig) &
+            (timeout 360 qemu-system-x86_64 -cpu max -m 1024 -cdrom bootsatz/bootsatz.iso -nographic -no-reboot </dev/null > boot.log 2>&1; touch boot.fertig) &
             QPID=$!
             for t in $(seq 1 60); do
               sleep 6
