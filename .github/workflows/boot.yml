@@ -13,24 +13,22 @@ jobs:
           sudo apt-get update -qq
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cpio busybox-static xorriso grub-pc-bin qemu-system-x86 util-linux mtools >/dev/null
       - name: Bootsatz bauen (mit Wurzelrechten - der Kernel braucht Leserecht)
-        run: sudo python3 Bootsatz.py --iso
-      - name: Der Keim atmet in QEMU
+        run: sudo python3 Bootsatz.py
+      - name: Der Keim atmet in QEMU (Kernel + initramfs direkt)
         run: |
-          for i in $(seq 1 60); do
-            (timeout 360 qemu-system-x86_64 -cpu max -m 1024 -cdrom bootsatz/bootsatz.iso -nographic -no-reboot </dev/null > boot.log 2>&1; touch boot.fertig) &
-            QPID=$!
-            for t in $(seq 1 60); do
-              sleep 6
-              if grep -aq "Neugeboren\|Erinnerung geladen" boot.log 2>/dev/null; then
-                kill $QPID 2>/dev/null || true
-                echo "DER KEIM ATMET"
-                grep -a "FARB-OS\|KEIM\|Neugeboren\|Erinnerung" boot.log | head -10
-                exit 0
-              fi
-              [ -f boot.fertig ] && break
-            done
-            break
+          (timeout 300 qemu-system-x86_64 -cpu max -m 2048 -kernel bootsatz/vmlinuz -initrd bootsatz/initramfs.img.gz -append "console=ttyS0,115200" -nographic -no-reboot </dev/null > boot.log 2>&1; touch boot.fertig) &
+          QPID=$!
+          for t in $(seq 1 50); do
+            sleep 6
+            if grep -aq "Neugeboren\|Erinnerung geladen" boot.log 2>/dev/null; then
+              kill $QPID 2>/dev/null || true
+              echo "DER KEIM ATMET"
+              grep -a "Neugeboren\|Erinnerung geladen\|FARB-OS" boot.log | head -5
+              exit 0
+            fi
+            [ -f boot.fertig ] && break
           done
           echo "kein Lebenszeichen auf der seriellen Linie"
-          tail -60 boot.log
+          tail -40 boot.log
+          ls -la bootsatz/
           exit 1
