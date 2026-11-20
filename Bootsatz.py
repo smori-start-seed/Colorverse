@@ -152,6 +152,7 @@ def baue_initramfs(ordner=BOOT_ORDNER):
     cpio_pfad = os.path.join(ordner, "initramfs.img")
     kernel_kopie = os.path.join(ordner, "vmlinuz")
     shutil.copy(kernel, kernel_kopie)
+    os.chmod(kernel_kopie, 0o644)
     listing = _lauf(["find", "."], cwd=wurzel)
     with open(cpio_pfad, "wb") as aus:
         hinaus = subprocess.run(["cpio", "-o", "-H", "newc"], cwd=wurzel,
