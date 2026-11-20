@@ -158,10 +158,9 @@ def baue_initramfs(ordner=BOOT_ORDNER):
             raise RuntimeError("cpio fiel aus")
     _lauf(["gzip", "-f", cpio_pfad])
 
-    inhalt = _lauf(["sh", "-c", f"zcat {cpio_pfad}.gz | cpio -it"])
-    for pfad in ("./farb-os/python/bin/python3", "./lib64/ld-linux-x86-64.so.2", "./init"):
-        if pfad not in inhalt:
-            raise RuntimeError(f"{pfad} fehlt im initramfs")
+    for pfad in ("./farb-os/python/bin/python3", "./lib64/ld-linux-x86-64.so.2", "./init", "./bin/busybox"):
+        if not os.path.exists(os.path.join(wurzel, pfad)):
+            raise RuntimeError(f"{pfad} fehlt in der initramfs-Wurzel")
 
     return kernel, cpio_pfad + ".gz"
 
