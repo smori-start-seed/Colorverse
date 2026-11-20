@@ -96,5 +96,22 @@ UI_ANIMATION_SPEED = 1.0
 # 9) Systeminfo
 # ------------------------------------------------------------
 
-COLORVERSE_VERSION = "1.0.0-harmony"
+COLORVERSE_VERSION = "1.1.0-harmony"
+
+
+# ------------------------------------------------------------
+# 10) FARB-OS - Persistenz, Gate & Schattenlauf
+# ------------------------------------------------------------
+
+GEDAECHTNIS_DATEI = "colorverse_geist.bin"   # Unikat-Speicher (HW-gebunden)
+HASH_DURCHLAEUFE = 100000                    # Schluesselableitung
+
+GATE_LEDGER_DATEI = "vereinbarungen.json"    # Zustimmungen des Interactors
+GATE_LOG_DATEI = "gate_log.json"             # Jeder Austauschversuch wird notiert
+
+SCHATTEN_SCHRITTE = 30                       # Simulations-Horizont vor/nach Umsetzung
+SCHATTEN_TOLERANZ = 0.05                     # Maximal akzeptierte Verschlechterung
+
+SNAPSHOT_INTERVALL = 100                     # Erinnerung alle N Schritte
+DEBUG_ZELLE = False                          # Zell-Druck (sonst nur Engine-Ebene)
 

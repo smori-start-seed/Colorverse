@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+colorverse_geist.bin
+vereinbarungen.json
+gate_log.json
