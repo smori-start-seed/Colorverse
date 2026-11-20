@@ -23,6 +23,10 @@ def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
         print("[FARB-OS]  Der Geburtsakt widerspricht dieser Maschine.")
         print("           Dieses Unikat wohnt nicht hier. Keine Erinnerung, keine Geburt.")
         return
+    if geburt.get("unlesbar"):
+        print("[FARB-OS]  Der Geburtsakt ist unlesbar - vielleicht beschaedigt, vielleicht fremd.")
+        print("           Ohne klares Wort wird hier nichts neu geboren.")
+        return
 
     engine = Engine()
     build_world(engine)

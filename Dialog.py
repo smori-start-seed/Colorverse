@@ -9,6 +9,13 @@ from config import *
 from Gate import darf, senden, empfangen, zustimmung_einholen, _loggen
 
 
+def _interaktiv():
+    try:
+        return sys.stdin.isatty()
+    except Exception:
+        return False
+
+
 # ============================================================
 #  HINAUF - Zustand des Colorverse
 # ============================================================
@@ -28,7 +35,7 @@ def _zustand(engine):
 def hinauf(engine):
     schritt = engine.step_count
     if not darf(DIALOG_KANAL_HINAUF, schritt):
-        if sys.stdin.isatty() if hasattr(sys.stdin, "isatty") else False:
+        if _interaktiv():
             zustimmung_einholen(DIALOG_KANAL_HINAUF, schritt=schritt, zweck="Lesen des Zustands")
         if not darf(DIALOG_KANAL_HINAUF, schritt):
             return None
@@ -70,7 +77,7 @@ def herab(engine):
         roh = f.read()
 
     if not darf(DIALOG_KANAL_HERAB, engine.step_count):
-        if sys.stdin.isatty() if hasattr(sys.stdin, "isatty") else False:
+        if _interaktiv():
             zustimmung_einholen(DIALOG_KANAL_HERAB, schritt=engine.step_count, zweck="Impulse in das Evolutionsfeld")
         if not darf(DIALOG_KANAL_HERAB, engine.step_count):
             return None

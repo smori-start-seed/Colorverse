@@ -51,12 +51,15 @@ def geburtsakt_lesen():
 # ============================================================
 
 def wache():
+    if not os.path.exists(GEBURTSAKT_DATEI):
+        geburtsakt_schreiben()
+        return {"geburt": True, "individualitaet": abweichung()}
+
     akt = geburtsakt_lesen()
 
     if akt is None:
-        ind = abweichung()
-        geburtsakt_schreiben()
-        return {"geburt": True, "individualitaet": ind}
+        # Datei vorhanden, aber unlesbar: NIE still neu gebaren.
+        return {"unlesbar": True}
 
     if akt.get("stabil") != stabile_signatur():
         return {"fremd": True, "geburtsakt": akt}

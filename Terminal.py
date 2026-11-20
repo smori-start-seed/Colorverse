@@ -49,7 +49,7 @@ def zeige(engine, titel="FARB-OS"):
     for zr in range(TERMINAL_HOEHE):
         reihe = []
         for sp in range(TERMINAL_BREITE):
-            basis = (zr * TERMINAL_BREITE + sp) * schritt
+            basis = (zr * TERMINAL_BREITE + sp) * n // anzahl
             gruppe = engine.zellen[basis:basis + schritt]
             if not gruppe:
                 break
