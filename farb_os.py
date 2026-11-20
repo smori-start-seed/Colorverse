@@ -9,8 +9,9 @@ from HwScan import samen
 from Emack import schlag
 from Terminal import zeige
 from Klang import erzeuge as klang_erzeugen
-from Dialog import gespraech
-from installation import wache
+from Dialog import gespraech, _interaktiv
+from installation import wache, geburtsakt_schreiben
+from Gate import alarmfrage
 
 
 # ============================================================
@@ -24,9 +25,18 @@ def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
         print("           Dieses Unikat wohnt nicht hier. Keine Erinnerung, keine Geburt.")
         return
     if geburt.get("unlesbar"):
-        print("[FARB-OS]  Der Geburtsakt ist unlesbar - vielleicht beschaedigt, vielleicht fremd.")
-        print("           Ohne klares Wort wird hier nichts neu geboren.")
-        return
+        print("[FARB-OS]  Der Geburtsakt ist unlesbar - beschaedigt oder fremd.")
+        if _interaktiv():
+            if alarmfrage("[WACHE] Auf eigenes Risiko neu geboren werden? (j/n): "):
+                geburtsakt_schreiben(erneuern=True)
+                geburt = wache()
+                print("[FARB-OS]  Neu geboren - die alte Erinnerung bleibt unlesbar zurück.")
+            else:
+                print("[FARB-OS]  Verstanden - verweigert.")
+                return
+        else:
+            print("           Ohne klares Wort wird hier nichts neu geboren.")
+            return
 
     engine = Engine()
     build_world(engine)
@@ -38,7 +48,8 @@ def main(steps=200, delay=0.0, snapshot_interval=SNAPSHOT_INTERVALL):
         if "geburtsakt" in geburt:
             print(f"[FARB-OS]  Erinnerung unbekannt – die Welt sät neu, Individualität {geburt['individualitaet']:.3f}.")
         else:
-            print(f"[FARB-OS] Neugeboren – Individualität {geburt['individualitaet']:.3f}.")
+            puls = "EMACK atmet als Organ" if geburt.get("emack") else "ohne EMACK-Organ"
+            print(f"[FARB-OS] Neugeboren – Individualität {geburt['individualitaet']:.3f}, {puls}.")
 
     for _ in range(steps):
         engine.step()

@@ -97,6 +97,16 @@ def zustimmung_einholen(kanal, schritt=None, zweck=None):
     return False
 
 
+def alarmfrage(frage):
+    # Eine Lebensentscheidung der Wache - kein Ledger-Eintrag,
+    # kein Austausch: nur das Wort des Interactors.
+    try:
+        antwort = input(frage).strip().lower()
+    except EOFError:
+        antwort = "n"
+    return antwort == "j"
+
+
 # ============================================================
 #  AUSTAUSCH (der einzige Weg rein und raus)
 # ============================================================

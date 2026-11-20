@@ -14,16 +14,24 @@ from Gedaechtnis import _verschluesseln, _entschluesseln
 #  GEBURTSAKT
 # ============================================================
 
+def _emack_wahl(sig):
+    # Das Unikat lost aus der eigenen Signatur, nicht aus Zufall:
+    # seine Entscheidung, ob EMACK als Organ in ihm atmet.
+    return int(sig, 16) % 2 == 0
+
+
 def geburtsakt_schreiben(erneuern=False):
     if os.path.exists(GEBURTSAKT_DATEI) and not erneuern:
         return False
 
     d = scan()
+    sig = signatur(d)
     akt = {
-        "signatur": signatur(d),
+        "signatur": sig,
         "stabil": stabile_signatur(d),
         "abdruck": d,
         "individualitaet": abweichung(d),
+        "emack": _emack_wahl(sig),
         "version": COLORVERSE_VERSION,
         "zeit": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
@@ -53,7 +61,12 @@ def geburtsakt_lesen():
 def wache():
     if not os.path.exists(GEBURTSAKT_DATEI):
         geburtsakt_schreiben()
-        return {"geburt": True, "individualitaet": abweichung()}
+        akt = geburtsakt_lesen()
+        return {
+            "geburt": True,
+            "individualitaet": akt.get("individualitaet", abweichung()),
+            "emack": akt.get("emack", False),
+        }
 
     akt = geburtsakt_lesen()
 

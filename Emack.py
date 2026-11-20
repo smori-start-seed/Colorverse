@@ -13,6 +13,24 @@ b_af = 0.5
 b_pf = 0.5
 b_rf = 0.5
 
+_wahl = None
+
+
+# ============================================================
+#  ORGAN-WAHL (aus dem Geburtsakt)
+# ============================================================
+
+def _organ():
+    global _wahl
+    if _wahl is None:
+        try:
+            from installation import geburtsakt_lesen
+            akt = geburtsakt_lesen()
+            _wahl = bool(akt.get("emack", False)) if akt else False
+        except Exception:
+            _wahl = False
+    return _wahl
+
 
 # ============================================================
 #  PULSGEBER LADEN
@@ -41,7 +59,7 @@ def _puls():
 def schlag(engine):
     global b_af, b_pf, b_rf
 
-    if not ENABLE_EMACK:
+    if not ENABLE_EMACK or not _organ():
         return None
 
     modul = _puls()
