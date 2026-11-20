@@ -1,0 +1,36 @@
+name: Bootprobe
+
+on: [push, pull_request]
+
+jobs:
+  keim-atmet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Werkzeuge des Bodens
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cpio busybox-static xorriso grub-pc-bin qemu-system-x86 util-linux mtools >/dev/null
+      - name: Bootsatz bauen (mit Wurzelrechten - der Kernel braucht Leserecht)
+        run: sudo python3 Bootsatz.py --iso
+      - name: Der Keim atmet in QEMU
+        run: |
+          for i in $(seq 1 60); do
+            (timeout 360 qemu-system-x86_64 -m 1024 -cdrom bootsatz/bootsatz.iso -nographic -no-reboot </dev/null > boot.log 2>&1; touch boot.fertig) &
+            QPID=$!
+            for t in $(seq 1 60); do
+              sleep 6
+              if grep -aq "Neugeboren\|Erinnerung geladen" boot.log 2>/dev/null; then
+                kill $QPID 2>/dev/null || true
+                echo "DER KEIM ATMET"
+                grep -a "FARB-OS\|KEIM\|Neugeboren\|Erinnerung" boot.log | head -10
+                exit 0
+              fi
+              [ -f boot.fertig ] && break
+            done
+            break
+          done
+          echo "kein Lebenszeichen auf der seriellen Linie"
+          tail -60 boot.log
+          exit 1

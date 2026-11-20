@@ -181,3 +181,14 @@ GEBURTSAKT_DATEI = "geburtsakt.bin"
 
 ZUSTIMMUNG_DAUER = 500   # Schritte, danach fragt das Gate erneut
 
+
+# ------------------------------------------------------------
+# 17) BOOT - vom Keim zum Boden (Bootstrap-Stufen)
+# ------------------------------------------------------------
+
+BOOT_ORDNER = "bootsatz"                    # hier baut der Bootsatz: kernel, initramfs, iso
+BOOT_TIMEOUT = 5                            # Sekunden im GRUB-Bildschirm
+BODEN_DATEISYSTEM = "ext4"                  # der Boden, in den gepflanzt wird
+BODEN_PYTHON_URL = "https://github.com/astral-sh/python-build-standalone/releases/download/20241016/cpython-3.12.7+20241016-x86_64-unknown-linux-gnu-install_only.tar.gz"
+BODEN_INITRAMFS_ORDNER = "initramfs_wurzel" # Wurzel des frisch geborenen Systems
+
