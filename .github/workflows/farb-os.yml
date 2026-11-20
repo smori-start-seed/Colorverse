@@ -1,0 +1,20 @@
+name: Farb-OS Keim
+
+on: [push, pull_request]
+
+jobs:
+  atmung:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: smori-start-seed/Urasil_light
+          path: Urasil_light
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Uebersetzen
+        run: python -m compileall -q .
+      - name: Der Keim atmet
+        run: timeout 60 python farb_os.py < /dev/null
