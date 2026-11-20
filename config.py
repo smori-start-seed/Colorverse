@@ -115,3 +115,42 @@ SCHATTEN_TOLERANZ = 0.05                     # Maximal akzeptierte Verschlechter
 SNAPSHOT_INTERVALL = 100                     # Erinnerung alle N Schritte
 DEBUG_ZELLE = False                          # Zell-Druck (sonst nur Engine-Ebene)
 
+
+# ------------------------------------------------------------
+# 11) KONSOLE - ANSI-Renderer
+# ------------------------------------------------------------
+
+ENABLE_KONSOLE = True
+KONSOLE_INTERVALL = 10
+TERMINAL_BREITE = 60
+TERMINAL_HOEHE = 10
+
+
+# ------------------------------------------------------------
+# 12) KLANG - Audio-Ausgabe
+# ------------------------------------------------------------
+
+ENABLE_KLANG = True
+KLANG_INTERVALL = 50
+KLANG_DAUER = 2.0
+KLANG_DATEI = "klang.wav"
+KLANG_MIN_FREQ = 110.0
+KLANG_MAX_FREQ = 440.0
+
+
+# ------------------------------------------------------------
+# 13) HW-SCAN - Individualisierung durch Abweichung
+# ------------------------------------------------------------
+
+ENABLE_HWSCAN = True
+
+
+# ------------------------------------------------------------
+# 14) EMACK - Puls-Kopplung zu Urasil_light
+# ------------------------------------------------------------
+
+ENABLE_EMACK = True
+EMACK_URASIL_PFAD = ["../Urasil_light", "../github__smori-start-seed__Urasil_light"]
+EMACK_SYNC_STAERKE = 0.1
+EMACK_MUTATION = 0.02
+

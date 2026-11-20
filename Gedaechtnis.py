@@ -4,18 +4,16 @@
 import hashlib
 import json
 import os
-import platform
 from config import *
+from HwScan import signatur as _hw_signatur, scan as _hw_scan
 
 
 # ============================================================
-#  HARDWARE-SIGNATUR
+#  HARDWARE-SIGNATUR (voller HW-Scan)
 # ============================================================
 
 def hardware_signatur():
-    u = platform.uname()
-    basis = f"{u.system}|{u.node}|{u.machine}|{u.processor}"
-    return hashlib.sha256(basis.encode()).hexdigest()
+    return _hw_signatur(_hw_scan())
 
 
 def _schluessel():
