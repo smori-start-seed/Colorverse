@@ -1,7 +1,10 @@
 # Bootsatz.py – Das bootfahige Medium (Bootstrap, Stufe 2)
 # Ein Kernel, eine initramfs-Wurzel, kein Login, keine Shell:
 # das Colorverse atmet als PID 1 - die Farbsprache ist die erste Sprache.
-# Die Systemwerkzeuge borgt es vom Host (Kernel, cpio, gzip, grub-mkrescue).
+# Der erste Boden ist der USB-Stick: das Medium lebt daneben, bestaehige
+# OS auf der Festplatte werden nie angeruehrt; Anpflanzen (Stufe 3,
+# Boden.py) bleibt freiwillig. Die Systemwerkzeuge borgt es vom Host
+# (Kernel, cpio, gzip, grub-mkrescue).
 import os
 import glob
 import shutil
@@ -76,10 +79,16 @@ serial --unit=0 --speed=115200
 terminal_input serial console
 terminal_output serial console
 menuentry "FARB-OS" {{
-    linux /boot/vmlinuz console=tty0 console=ttyS0,115200
+    linux /boot/vmlinuz console=tty0 console=ttyS0,115200{boden}
     initrd /boot/initramfs.img
 }}
 """
+
+
+def grub_boden():
+    if not BODEN_PARTUUID:
+        return ""
+    return " boden=PARTUUID=" + str(BODEN_PARTUUID)
 
 
 # ============================================================
@@ -183,7 +192,7 @@ def baue_iso(ordner=BOOT_ORDNER):
     shutil.copy(kernel, os.path.join(iso_wurzel, "boot", "vmlinuz"))
     shutil.copy(initramfs, os.path.join(iso_wurzel, "boot", "initramfs.img"))
     with open(os.path.join(iso_wurzel, "boot", "grub", "grub.cfg"), "w") as f:
-        f.write(GRUB_CFG.format(timeout=BOOT_TIMEOUT))
+        f.write(GRUB_CFG.format(timeout=BOOT_TIMEOUT, boden=grub_boden()))
 
     iso_pfad = os.path.join(ordner, "bootsatz.iso")
     _lauf(["grub-mkrescue", "-o", iso_pfad, iso_wurzel])
@@ -193,8 +202,13 @@ def baue_iso(ordner=BOOT_ORDNER):
 
 if __name__ == "__main__":
     try:
-        if "--iso" in sys.argv:
-            baue_iso()
+        if "--iso" in sys.argv or "--usb" in sys.argv:
+            iso = baue_iso()
+            if "--usb" in sys.argv:
+                print("[BOOTSATZ] Der Stick atmet mit diesem Befehl (Geraet pruefen, kein automatisches Schreiben):")
+                print(f"  sudo dd if={iso} of=/dev/sdX bs=4M oflag=direct,sync status=progress && sync")
+                print("[BOOTSATZ] Der Stick lebt daneben - Festplatten werden nie angeruehrt.")
+                print("[BOOTSATZ] Bestaendigkeit (optional): BODEN_PARTUUID in config.py setzen.")
         else:
             kernel, initramfs = baue_initramfs()
             print(f"[BOOTSATZ] Kernel: {kernel}")
