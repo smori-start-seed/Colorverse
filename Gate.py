@@ -4,6 +4,8 @@
 # in der eigenen Zeit des Systems, nicht in einer Wanduhr.
 import json
 import os
+import select
+import sys
 import time
 from config import *
 from Gedaechtnis import hardware_signatur
@@ -76,16 +78,31 @@ def darf(kanal, schritt=None):
     return True
 
 
+def _wort_holen(frage):
+    # Eine Frage der Welt wartet eine Wartezeit lang auf das Wort des
+    # Interactors - und schweigen ist Ablehnung. Die Welt steht nie
+    # still, weil niemand am Wort haelt..
+    sys.stdout.write(frage)
+    sys.stdout.flush()
+    try:
+        bereit, _, _ = select.select([sys.stdin], [], [], GATE_FRAGE_SEKUNDEN)
+    except (OSError, ValueError):
+        return ""
+    if not bereit:
+        return ""
+    try:
+        return sys.stdin.readline().strip().lower()
+    except (EOFError, OSError):
+        return ""
+
+
 def zustimmung_einholen(kanal, schritt=None, zweck=None):
     frage = f"[GATE] Austausch ueber '{kanal}'"
     if zweck:
         frage += f" (Zweck: {zweck})"
     frage += " erlauben? (j/n/i): "
 
-    try:
-        antwort = input(frage).strip().lower()
-    except EOFError:
-        antwort = "n"
+    antwort = _wort_holen(frage)
 
     if antwort == "j":
         zustimmen(kanal, zweck=zweck, schritt=schritt)
@@ -100,10 +117,7 @@ def zustimmung_einholen(kanal, schritt=None, zweck=None):
 def alarmfrage(frage):
     # Eine Lebensentscheidung der Wache - kein Ledger-Eintrag,
     # kein Austausch: nur das Wort des Interactors.
-    try:
-        antwort = input(frage).strip().lower()
-    except EOFError:
-        antwort = "n"
+    antwort = _wort_holen(frage)
     return antwort == "j"
 
 

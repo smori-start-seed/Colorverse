@@ -180,6 +180,7 @@ GEBURTSAKT_DATEI = "geburtsakt.bin"
 # ------------------------------------------------------------
 
 ZUSTIMMUNG_DAUER = 500   # Schritte, danach fragt das Gate erneut
+GATE_FRAGE_SEKUNDEN = 30 # Wie lange das Gate auf das Wort des Interactors wartet - Schweigen lehnt ab
 
 
 # ------------------------------------------------------------

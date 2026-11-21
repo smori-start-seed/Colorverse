@@ -9,7 +9,7 @@ import subprocess
 import sys
 import glob
 from config import *
-from Gate import alarmfrage, _loggen
+from Gate import alarmfrage, _wort_holen, _loggen
 from Dialog import _interaktiv
 
 
@@ -76,7 +76,7 @@ def ritual(ziel):
     print(f"[BODEN] Platte: {platte}, Groesse {gross}.")
     if not alarmfrage(f"[BODEN] {ziel} wirklich ganz ausraeumen und pflanzen? (j/n): "):
         raise RuntimeError("verstanden - der Boden bleibt")
-    wort = input(f"[BODEN] Nenne den vollen Namen des Bodens zum Bestaetigen ({ziel}): ").strip()
+    wort = _wort_holen(f"[BODEN] Nenne den vollen Namen des Bodens zum Bestaetigen ({ziel}): ")
     if wort != ziel:
         raise RuntimeError("das Wort passt nicht zum Boden - verweigert")
     _loggen("boden-" + os.path.basename(ziel), "zustimmung", erlaubt=True)
