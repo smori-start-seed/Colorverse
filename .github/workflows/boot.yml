@@ -48,7 +48,7 @@ jobs:
         run: sudo chmod -R a+rX bootsatz/
       - name: Der Stick atmet in QEMU (Medium als usb-storage angesteckt)
         run: |
-          (timeout 300 qemu-system-x86_64 -cpu max -m 2048 -drive if=none,id=stick,format=raw,file=bootsatz/bootsatz.iso -device qemu-xhci -device usb-storage,drive=stick -nographic -no-reboot </dev/null > stick.log 2>&1; touch stick.fertig) &
+          (timeout 300 qemu-system-x86_64 -cpu max -m 2048 -drive if=none,id=stick,format=raw,readonly=on,file=bootsatz/bootsatz.iso -device qemu-xhci -device usb-storage,drive=stick -nographic -no-reboot </dev/null > stick.log 2>&1; touch stick.fertig) &
           QPID=$!
           for t in $(seq 1 50); do
             sleep 6
