@@ -23,15 +23,12 @@ class Sphere:
         self.update_sphere()
 
     # ---------------------------------------------------------
-    # 2. Sphere-Update: Ringe updaten + Farbsatz aggregieren
+    # 2. Sphere-Update: Farbsatz aggregieren
+    #    (Ringe wurden bereits von der Engine aktualisiert)
     # ---------------------------------------------------------
     def update_sphere(self):
 
-        # 2.1 Alle Ringe updaten
-        for r in self.ringe:
-            r.update()
-
-        # 2.2 Farbsatz aggregieren
+        # 2.1 Farbsatz aggregieren
         self.berechne_sphere_farbsatz()
         print(f"[SPHERE] hue={self.hue_avg:.2f} sat={self.sat_avg:.2f} bri={self.bri_avg:.2f} energy={self.energy_avg:.2f} harm={self.harmonie_avg:.2f} drift={self.drift_avg:.2f}")
 

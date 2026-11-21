@@ -22,15 +22,12 @@ class MetaSphere:
         self.update_metasphere()
 
     # ---------------------------------------------------------
-    # 2. MetaSphere-Update: Spheres updaten + Aggregation
+    # 2. MetaSphere-Update: Meta-Werte aggregieren
+    #    (Spheres wurden bereits von der Engine aktualisiert)
     # ---------------------------------------------------------
     def update_metasphere(self):
 
-        # 2.1 Alle Spheres updaten
-        for s in self.spheren:
-            s.update()
-
-        # 2.2 Meta-Werte aggregieren
+        # 2.1 Meta-Werte aggregieren
         self.berechne_metasphere()
 
     # ---------------------------------------------------------

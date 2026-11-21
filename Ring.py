@@ -17,15 +17,12 @@ class Ring:
         self.update_ring()
 
     # ---------------------------------------------------------
-    # 2. Ring-Update: Cluster updaten + Farbsatz aggregieren
+    # 2. Ring-Update: Farbsatz aggregieren
+    #    (Cluster wurden bereits von der Engine aktualisiert)
     # ---------------------------------------------------------
     def update_ring(self):
 
-        # 2.1 Alle Cluster updaten
-        for c in self.cluster:
-            c.update()
-
-        # 2.2 Farbsatz aggregieren
+        # 2.1 Farbsatz aggregieren
         self.berechne_ring_farbsatz()
         print(f"[RING] hue={self.hue_avg:.2f} sat={self.sat_avg:.2f} bri={self.bri_avg:.2f}")
 

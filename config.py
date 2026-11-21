@@ -96,5 +96,103 @@ UI_ANIMATION_SPEED = 1.0
 # 9) Systeminfo
 # ------------------------------------------------------------
 
-COLORVERSE_VERSION = "1.0.0-harmony"
+COLORVERSE_VERSION = "1.1.0-harmony"
+
+
+# ------------------------------------------------------------
+# 10) FARB-OS - Persistenz, Gate & Schattenlauf
+# ------------------------------------------------------------
+
+GEDAECHTNIS_DATEI = "colorverse_geist.bin"   # Unikat-Speicher (HW-gebunden)
+GEDAECHTNIS_TEMPO = "colorverse_geist.tmp"   # Bühne zum atomaren Verwahren
+HASH_DURCHLAEUFE = 100000                    # Schluesselableitung
+
+GATE_LEDGER_DATEI = "vereinbarungen.json"    # Zustimmungen des Interactors
+GATE_LEDGER_TEMPO = "vereinbarungen.tmp"     # Bühne zum atomaren Verwahren
+GATE_LOG_DATEI = "gate_log.json"             # Jeder Austauschversuch wird notiert
+
+SCHATTEN_SCHRITTE = 30                       # Simulations-Horizont vor/nach Umsetzung
+SCHATTEN_TOLERANZ = 0.05                     # Maximal akzeptierte Verschlechterung
+
+SNAPSHOT_INTERVALL = 100                     # Erinnerung alle N Schritte
+DEBUG_ZELLE = False                          # Zell-Druck (sonst nur Engine-Ebene)
+
+
+# ------------------------------------------------------------
+# 11) KONSOLE - ANSI-Renderer
+# ------------------------------------------------------------
+
+ENABLE_KONSOLE = True
+KONSOLE_INTERVALL = 10
+TERMINAL_BREITE = 60
+TERMINAL_HOEHE = 10
+
+
+# ------------------------------------------------------------
+# 12) KLANG - Audio-Ausgabe
+# ------------------------------------------------------------
+
+ENABLE_KLANG = True
+KLANG_INTERVALL = 50
+KLANG_DAUER = 2.0
+KLANG_DATEI = "klang.wav"
+KLANG_MIN_FREQ = 110.0
+KLANG_MAX_FREQ = 440.0
+
+
+# ------------------------------------------------------------
+# 13) HW-SCAN - Individualisierung durch Abweichung
+# ------------------------------------------------------------
+
+ENABLE_HWSCAN = True
+
+
+# ------------------------------------------------------------
+# 14) EMACK - Puls-Kopplung zu Urasil_light
+# ------------------------------------------------------------
+
+ENABLE_EMACK = True
+EMACK_URASIL_PFAD = ["../Urasil_light", "../github__smori-start-seed__Urasil_light"]
+EMACK_SYNC_STAERKE = 0.1
+EMACK_MUTATION = 0.02
+EMACK_KANAL = "emack-puls"                   # Gate-Kanal des Pulses - Austausch nur mit Zustimmung
+
+
+# ------------------------------------------------------------
+# 14a) DIALOG - das Gespraech mit dem Interactor
+# ------------------------------------------------------------
+
+DIALOG_INTERVALL = 25
+DIALOG_EINGANG_DATEI = "eingang.json"
+DIALOG_AUSGANG_DATEI = "ausgang.json"
+DIALOG_KANAL_HINAUF = "interactor-hinauf"
+DIALOG_KANAL_HERAB = "interactor-herab"
+DIALOG_SCHATTEN = True                      # Impuls erst durchs innere Gericht
+
+
+# ------------------------------------------------------------
+# 15) GEBURT - Attestierung der Identitaet
+# ------------------------------------------------------------
+
+GEBURTSAKT_DATEI = "geburtsakt.bin"
+
+
+# ------------------------------------------------------------
+# 16) ZUSTIMMUNG - Ablauf in Schritten des Colorverse
+# ------------------------------------------------------------
+
+ZUSTIMMUNG_DAUER = 500   # Schritte, danach fragt das Gate erneut
+GATE_FRAGE_SEKUNDEN = 30 # Wie lange das Gate auf das Wort des Interactors wartet - Schweigen lehnt ab
+
+
+# ------------------------------------------------------------
+# 17) BOOT - vom Keim zum Boden (Bootstrap-Stufen)
+# ------------------------------------------------------------
+
+BOOT_ORDNER = "bootsatz"                    # hier baut der Bootsatz: kernel, initramfs, iso
+BOOT_TIMEOUT = 5                            # Sekunden im GRUB-Bildschirm
+BODEN_PARTUUID = None                       # z.B. "1234-ABCD" - die Welt lebt dann auf dieser Partition (Bestaendigkeit), sonst im RAM
+BODEN_DATEISYSTEM = "ext4"                  # der Boden, in den gepflanzt wird
+BODEN_PYTHON_URL = "https://github.com/astral-sh/python-build-standalone/releases/download/20241016/cpython-3.12.7+20241016-x86_64-unknown-linux-gnu-install_only.tar.gz"
+BODEN_INITRAMFS_ORDNER = "initramfs_wurzel" # Wurzel des frisch geborenen Systems
 

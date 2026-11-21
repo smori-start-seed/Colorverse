@@ -1,0 +1,65 @@
+name: Bootprobe
+
+on: [push, pull_request]
+
+jobs:
+  keim-atmet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Werkzeuge des Bodens
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cpio busybox-static xorriso grub-pc-bin qemu-system-x86 util-linux mtools >/dev/null
+      - name: Bootsatz bauen (mit Wurzelrechten - der Kernel braucht Leserecht)
+        run: sudo python3 Bootsatz.py
+      - name: Der Keim atmet in QEMU (Kernel + initramfs direkt)
+        run: |
+          (timeout 300 qemu-system-x86_64 -cpu max -m 2048 -kernel bootsatz/vmlinuz -initrd bootsatz/initramfs.img.gz -append "console=ttyS0,115200" -nographic -no-reboot </dev/null > boot.log 2>&1; touch boot.fertig) &
+          QPID=$!
+          for t in $(seq 1 50); do
+            sleep 6
+            if grep -aq "Neugeboren\|Erinnerung geladen" boot.log 2>/dev/null; then
+              kill $QPID 2>/dev/null || true
+              echo "DER KEIM ATMET"
+              grep -a "Neugeboren\|Erinnerung geladen\|FARB-OS" boot.log | head -5
+              exit 0
+            fi
+            [ -f boot.fertig ] && break
+          done
+          echo "kein Lebenszeichen auf der seriellen Linie"
+          tail -40 boot.log
+          ls -la bootsatz/
+          exit 1
+
+  stock-atmet:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Werkzeuge des Bodens
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cpio busybox-static xorriso grub-pc-bin qemu-system-x86 util-linux mtools >/dev/null
+      - name: USB-Medium bauen (mit Wurzelrechten - der Kernel braucht Leserecht)
+        run: sudo python3 Bootsatz.py --iso
+      - name: Vom Wurzelbau lesen lassen (0600 vom Wurzelbau wird nicht geerbt)
+        run: sudo chmod -R a+rX bootsatz/
+      - name: Der Stick atmet in QEMU (Medium als usb-storage angesteckt)
+        run: |
+          (timeout 300 qemu-system-x86_64 -cpu max -m 2048 -drive if=none,id=stick,format=raw,readonly=on,file=bootsatz/bootsatz.iso -device qemu-xhci -device usb-storage,drive=stick -nographic -no-reboot </dev/null > stick.log 2>&1; touch stick.fertig) &
+          QPID=$!
+          for t in $(seq 1 50); do
+            sleep 6
+            if grep -aq "Neugeboren\\|Erinnerung geladen" stick.log 2>/dev/null; then
+              kill $QPID 2>/dev/null || true
+              echo "DER STICK ATMET"
+              grep -a "Neugeboren\\|Erinnerung geladen\\|FARB-OS\\|GRUB" stick.log | head -5
+              exit 0
+            fi
+            [ -f stick.fertig ] && break
+          done
+          echo "kein Lebenszeichen vom Stick"
+          tail -40 stick.log
+          exit 1

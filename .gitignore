@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+colorverse_geist.bin
+colorverse_geist.tmp
+vereinbarungen.json
+vereinbarungen.tmp
+gate_log.json
+klang.wav
+eingang.json
+ausgang.json
+geburtsakt.bin
+bootsatz/
+bootsatz.iso
+initramfs_wurzel/
+boot.log
+boot.fertig
+cpython_install_only.tar.gz

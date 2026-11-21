@@ -61,29 +61,31 @@ class Zelle:
 
         self.harmonie = 1.0 - min(1.0, var / 180.0)
 
+    def notfall(self):
+        if self.nachbarn:
+            avg_hue = sum(n.hue for n in self.nachbarn) / len(self.nachbarn)
+            self.hue = avg_hue
+        else:
+            self.hue = (self.hue + 180) % 360
+
+        self.saturation = max(self.saturation, 0.25)
+        self.brightness = max(self.brightness, 0.25)
+        self.clamp()
+        return True
+
     def failsafe(self):
         if (self.saturation < 0.15 or
             self.brightness < 0.05 or
             self.drift > 0.7 or
             self.harmonie < 0.2):
 
-            self.hue = 0
-            self.saturation = 0
-            self.brightness = 0
-            self.drift = 0
-            self.harmonie = 1
-            return True
+            return self.notfall()
 
         if (self.saturation > 0.85 and
             self.brightness > 0.95 and
             self.harmonie > 0.8):
 
-            self.hue = 0
-            self.saturation = 0
-            self.brightness = 1
-            self.drift = 0
-            self.harmonie = 1
-            return True
+            return self.notfall()
 
         return False
 
@@ -102,7 +104,8 @@ class Zelle:
     def update(self):
         if self.hex:
             self.hex.apply(self)
-            print(f"[ZELLE] hue={self.hue:.2f} sat={self.saturation:.2f} bri={self.brightness:.2f} energy={self.energy:.2f}")
+            if DEBUG_ZELLE:
+                print(f"[ZELLE] hue={self.hue:.2f} sat={self.saturation:.2f} bri={self.brightness:.2f} energy={self.energy:.2f}")
 
 
         self.clamp()
