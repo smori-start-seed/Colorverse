@@ -44,6 +44,8 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cpio busybox-static xorriso grub-pc-bin qemu-system-x86 util-linux mtools >/dev/null
       - name: USB-Medium bauen (mit Wurzelrechten - der Kernel braucht Leserecht)
         run: sudo python3 Bootsatz.py --iso
+      - name: Vom Wurzelbau lesen lassen (0600 vom Wurzelbau wird nicht geerbt)
+        run: sudo chmod -R a+rX bootsatz/
       - name: Der Stick atmet in QEMU (Medium als usb-storage angesteckt)
         run: |
           (timeout 300 qemu-system-x86_64 -cpu max -m 2048 -drive if=none,id=stick,format=raw,file=bootsatz/bootsatz.iso -device qemu-xhci -device usb-storage,drive=stick -nographic -no-reboot </dev/null > stick.log 2>&1; touch stick.fertig) &
