@@ -85,8 +85,11 @@ def speichern(engine):
     zustand["pruefsumme"] = pruefsumme
     paket = _verschluesseln(json.dumps(zustand).encode())
 
-    with open(GEDAECHTNIS_DATEI, "wb") as f:
+    with open(GEDAECHTNIS_TEMPO, "wb") as f:
         f.write(paket)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(GEDAECHTNIS_TEMPO, GEDAECHTNIS_DATEI)
     return True
 
 

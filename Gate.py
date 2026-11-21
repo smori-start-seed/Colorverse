@@ -11,20 +11,23 @@ from config import *
 from Gedaechtnis import hardware_signatur
 
 
-# ============================================================
-#  LEDGER (Vereinbarungen)
-# ============================================================
-
 def _ledger_lesen():
     if not os.path.exists(GATE_LEDGER_DATEI):
         return {}
-    with open(GATE_LEDGER_DATEI, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(GATE_LEDGER_DATEI, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (ValueError, OSError):
+        # Ein unlesbares Ledger verweigert alles - nie die Welt sterben lassen.
+        return {}
 
 
 def _ledger_schreiben(ledger):
-    with open(GATE_LEDGER_DATEI, "w", encoding="utf-8") as f:
+    with open(GATE_LEDGER_TEMPO, "w", encoding="utf-8") as f:
         json.dump(ledger, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(GATE_LEDGER_TEMPO, GATE_LEDGER_DATEI)
 
 
 def _loggen(kanal, ereignis, erlaubt=False):

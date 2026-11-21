@@ -104,9 +104,11 @@ COLORVERSE_VERSION = "1.1.0-harmony"
 # ------------------------------------------------------------
 
 GEDAECHTNIS_DATEI = "colorverse_geist.bin"   # Unikat-Speicher (HW-gebunden)
+GEDAECHTNIS_TEMPO = "colorverse_geist.tmp"   # Bühne zum atomaren Verwahren
 HASH_DURCHLAEUFE = 100000                    # Schluesselableitung
 
 GATE_LEDGER_DATEI = "vereinbarungen.json"    # Zustimmungen des Interactors
+GATE_LEDGER_TEMPO = "vereinbarungen.tmp"     # Bühne zum atomaren Verwahren
 GATE_LOG_DATEI = "gate_log.json"             # Jeder Austauschversuch wird notiert
 
 SCHATTEN_SCHRITTE = 30                       # Simulations-Horizont vor/nach Umsetzung
